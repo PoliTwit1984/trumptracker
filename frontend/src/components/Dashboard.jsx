@@ -1,14 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Box, Grid, Typography, CircularProgress, Alert } from '@mui/material';
+import CampaignIcon from '@mui/icons-material/Campaign';
 import axios from 'axios';
 import PromiseMenu from './PromiseMenu';
 import InflationPromiseCard from './InflationPromiseCard';
+import PromiseTracker from './PromiseTracker';
 
 const UPDATE_INTERVAL = 300000; // 5 minutes
 
 function Dashboard() {
   const [categories, setCategories] = useState({});
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('Metrics');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const initialFetchDone = useRef(false);
@@ -24,7 +26,7 @@ function Dashboard() {
     console.log('Transforming metrics:', metrics);
     
     return {
-      Inflation: [
+      Metrics: [
         {
           id: 'cpi',
           title: metrics.cpi?.title || 'Consumer Price Index',
@@ -36,7 +38,7 @@ function Dashboard() {
           historical_data: metrics.cpi?.historical_data || [],
           units: metrics.cpi?.units,
           last_updated: metrics.cpi?.last_updated,
-          analysis: data.analysis
+          analysis: metrics.cpi?.analysis
         },
         {
           id: 'core_cpi',
@@ -49,7 +51,7 @@ function Dashboard() {
           historical_data: metrics.core_cpi?.historical_data || [],
           units: metrics.core_cpi?.units,
           last_updated: metrics.core_cpi?.last_updated,
-          analysis: data.analysis
+          analysis: metrics.core_cpi?.analysis
         },
         {
           id: 'food',
@@ -62,7 +64,7 @@ function Dashboard() {
           historical_data: metrics.food?.historical_data || [],
           units: metrics.food?.units,
           last_updated: metrics.food?.last_updated,
-          analysis: data.analysis
+          analysis: metrics.food?.analysis
         },
         {
           id: 'gas',
@@ -75,7 +77,7 @@ function Dashboard() {
           historical_data: metrics.gas?.historical_data || [],
           units: metrics.gas?.units,
           last_updated: metrics.gas?.last_updated,
-          analysis: data.analysis
+          analysis: metrics.gas?.analysis
         },
         {
           id: 'housing',
@@ -88,7 +90,7 @@ function Dashboard() {
           historical_data: metrics.housing?.historical_data || [],
           units: metrics.housing?.units,
           last_updated: metrics.housing?.last_updated,
-          analysis: data.analysis
+          analysis: metrics.housing?.analysis
         }
       ]
     };
@@ -109,9 +111,6 @@ function Dashboard() {
       
       if (transformedData) {
         setCategories(transformedData);
-        if (!selectedCategory) {
-          setSelectedCategory('Inflation');
-        }
         setError(null);
       } else {
         throw new Error('Failed to transform data');
@@ -124,7 +123,7 @@ function Dashboard() {
     } finally {
       setLoading(false);
     }
-  }, [transformData, selectedCategory]);
+  }, [transformData]);
 
   // Initial data fetch
   useEffect(() => {
@@ -178,7 +177,7 @@ function Dashboard() {
     );
   }
 
-  const selectedPromises = selectedCategory ? categories[selectedCategory] : [];
+  const selectedPromises = selectedCategory === 'Metrics' ? categories[selectedCategory] : [];
   console.log('Rendering promises:', selectedPromises);
 
   return (
@@ -200,11 +199,37 @@ function Dashboard() {
         zIndex: 1
       }}>
         <Box sx={{ p: 2 }}>
+          {/* Trump Tracker Title */}
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            mb: 3,
+            pl: 2,
+            borderBottom: 1,
+            borderColor: 'divider',
+            pb: 2
+          }}>
+            <CampaignIcon sx={{ 
+              fontSize: 32,
+              mr: 1,
+              color: 'primary.main'
+            }} />
+            <Typography 
+              variant="h5" 
+              sx={{ 
+                fontWeight: 'bold',
+                fontFamily: '"Roboto Condensed", sans-serif',
+                letterSpacing: '0.5px',
+                color: 'primary.main'
+              }}
+            >
+              The Trump Tracker
+            </Typography>
+          </Box>
           <Typography variant="h6" sx={{ mb: 2, pl: 2 }}>
             Dashboard
           </Typography>
           <PromiseMenu 
-            categories={categories} 
             selectedCategory={selectedCategory}
             onCategorySelect={handleCategorySelect}
           />
@@ -219,37 +244,40 @@ function Dashboard() {
         maxWidth: 'calc(100vw - 280px)', // Prevent horizontal scrolling
         overflowX: 'hidden'
       }}>
-        {selectedCategory && (
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="h5" sx={{ pl: 1 }}>
-              {selectedCategory} Metrics ({selectedPromises?.length || 0})
-            </Typography>
-          </Box>
+        {selectedCategory === 'Metrics' && (
+          <>
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="h5" sx={{ pl: 1 }}>
+                Inflation Metrics ({selectedPromises?.length || 0})
+              </Typography>
+            </Box>
+            <Grid 
+              container 
+              spacing={3} 
+              columns={{ xs: 12, sm: 12, md: 12, lg: 12 }}
+              sx={{ 
+                width: '100%',
+                m: 0,
+                '& > .MuiGrid-item': {
+                  pt: 3,
+                  pl: 3,
+                }
+              }}
+            >
+              {selectedPromises.map(promise => (
+                <Grid item xs={12} sm={6} lg={4} key={promise.id}>
+                  <InflationPromiseCard 
+                    promise={promise}
+                    metricType={promise.metric_type}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </>
         )}
-        
-        {selectedCategory === 'Inflation' && selectedPromises && (
-          <Grid 
-            container 
-            spacing={3} 
-            columns={{ xs: 12, sm: 12, md: 12, lg: 12 }}
-            sx={{ 
-              width: '100%',
-              m: 0, // Remove margin
-              '& > .MuiGrid-item': {
-                pt: 3, // Add top padding to grid items
-                pl: 3, // Add left padding to grid items
-              }
-            }}
-          >
-            {selectedPromises.map(promise => (
-              <Grid item xs={12} sm={6} lg={4} key={promise.id}>
-                <InflationPromiseCard 
-                  promise={promise}
-                  metricType={promise.metric_type}
-                />
-              </Grid>
-            ))}
-          </Grid>
+
+        {selectedCategory === 'Promises' && (
+          <PromiseTracker />
         )}
       </Box>
     </Box>

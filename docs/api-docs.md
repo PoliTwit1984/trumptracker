@@ -3,160 +3,203 @@
 ## Base URL
 `http://localhost:5003/api/v1`
 
-## Endpoints
+## Current Endpoints
 
-### Get Inflation Data
-```
-GET /inflation/data
-```
+### Inflation Data
 
-Returns current inflation metrics and analysis.
+#### GET /inflation/data
+Retrieves current inflation metrics and analysis.
 
-#### Response
+**Response**
 ```json
 {
   "status": "Success",
   "metrics": {
     "cpi": {
-      "title": "Consumer Price Index for All Urban Consumers: All Items in U.S. City Average",
-      "current_value": 314.686,
-      "baseline_value": 308.742,
-      "percentage_change": 1.93,
-      "historical_data": [
-        {
-          "date": "2023-11-01",
-          "value": 308.742
-        },
-        // ... more data points
-      ],
-      "units": "Index 1982-1984=100",
-      "last_updated": "2024-11-06"
+      "current_value": number,
+      "baseline_value": number,
+      "percentage_change": number,
+      "historical_data": array,
+      "units": string,
+      "last_updated": string,
+      "analysis": string
     },
-    "core_cpi": {
-      // Similar structure to cpi
-    },
-    "food": {
-      // Similar structure to cpi
-    },
-    "gas": {
-      // Similar structure to cpi
-    },
-    "housing": {
-      // Similar structure to cpi
-    }
+    "core_cpi": {...},
+    "food": {...},
+    "gas": {...},
+    "housing": {...}
   },
-  "analysis": "AI-generated analysis of trends",
-  "timestamp": "2024-11-06T20:28:53.782219"
+  "timestamp": string
 }
 ```
 
-### Initialize Historical Data
-```
-POST /inflation/initialize
-```
+#### POST /inflation/update
+Triggers a data update and analysis refresh.
 
-Fetches and stores historical data for all metrics.
-
-#### Response
-```json
-{
-  "status": "Success",
-  "message": "Historical data fetched and stored successfully",
-  "timestamp": "2024-11-06T20:12:48.488283"
-}
-```
-
-### Update Data
-```
-POST /inflation/update
-```
-
-Updates data with latest values from FRED API.
-
-#### Response
+**Response**
 ```json
 {
   "status": "Success",
   "message": "Data updated successfully",
-  "timestamp": "2024-11-06T20:12:48.488283"
+  "timestamp": string
 }
 ```
 
-### Backup Database
-```
-POST /inflation/backup
-```
+## Planned Endpoints
 
-Creates a backup of the current database.
+### Campaign Promises
 
-#### Response
+#### GET /promises
+Retrieves all campaign promises.
+
+**Response**
 ```json
 {
   "status": "Success",
-  "message": "Database backup created successfully",
-  "timestamp": "2024-11-06T20:12:48.488283"
+  "promises": [
+    {
+      "id": string,
+      "category": string,
+      "text": string,
+      "source": string,
+      "source_link": string,
+      "status": "waiting" | "completed",
+      "completion_date": string | null,
+      "created_at": string,
+      "updated_at": string
+    }
+  ],
+  "timestamp": string
 }
 ```
 
-### Health Check
-```
-GET /health
-```
+#### GET /promises/{category}
+Retrieves promises by category.
 
-Returns service health status.
+**Parameters**
+- category: string (Core Inflation, Energy Costs, Tax Measures, Trade Policy, Housing Affordability)
 
-#### Response
+#### POST /promises
+Creates a new promise.
+
+**Request Body**
 ```json
 {
-  "status": "healthy",
-  "timestamp": "2024-11-06T20:12:48.488283",
-  "version": "1.0.0",
-  "services": {
-    "data_fetcher": "healthy",
-    "analyzer": "healthy"
-  }
+  "category": string,
+  "text": string,
+  "source": string,
+  "source_link": string
 }
 ```
 
-## Error Responses
+#### PATCH /promises/{id}/status
+Updates promise status.
 
-All endpoints may return the following error responses:
-
-### Rate Limit Exceeded
+**Request Body**
 ```json
 {
-  "error": "Rate limit exceeded",
-  "status": "error",
-  "timestamp": "2024-11-06T20:12:48.488283"
+  "status": "waiting" | "completed",
+  "completion_date": string | null
 }
 ```
 
-### Service Error
+#### GET /promises/stats
+Retrieves promise completion statistics.
+
+**Response**
 ```json
 {
-  "error": "Internal server error",
-  "status": "error",
-  "timestamp": "2024-11-06T20:12:48.488283"
+  "status": "Success",
+  "stats": {
+    "total": number,
+    "completed": number,
+    "waiting": number,
+    "by_category": {
+      "category_name": {
+        "total": number,
+        "completed": number,
+        "waiting": number
+      }
+    }
+  },
+  "timestamp": string
 }
 ```
 
-### Validation Error
+## Database Schema
+
+### fred_series
+```sql
+CREATE TABLE fred_series (
+    series_id TEXT PRIMARY KEY,
+    title TEXT,
+    units TEXT,
+    last_updated TIMESTAMP,
+    latest_analysis TEXT,
+    analysis_timestamp TIMESTAMP
+);
+```
+
+### fred_data
+```sql
+CREATE TABLE fred_data (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    series_id TEXT,
+    date TIMESTAMP,
+    value REAL,
+    FOREIGN KEY (series_id) REFERENCES fred_series(series_id)
+);
+```
+
+### Planned Tables
+
+#### promises
+```sql
+CREATE TABLE promises (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    category TEXT NOT NULL,
+    text TEXT NOT NULL,
+    source TEXT NOT NULL,
+    source_link TEXT NOT NULL,
+    status TEXT DEFAULT 'waiting',
+    completion_date TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+#### promise_history
+```sql
+CREATE TABLE promise_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    promise_id INTEGER,
+    old_status TEXT,
+    new_status TEXT,
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (promise_id) REFERENCES promises(id)
+);
+```
+
+## Error Handling
+
+All endpoints return errors in the following format:
+
 ```json
 {
-  "error": "Invalid request parameters",
-  "status": "error",
-  "timestamp": "2024-11-06T20:12:48.488283"
+  "status": "Error",
+  "message": string,
+  "error_code": string,
+  "timestamp": string
 }
 ```
 
-## To Do
-1. Add authentication endpoints
-2. Add data export endpoints
-3. Add admin endpoints
-4. Add metric configuration endpoints
-5. Add data comparison endpoints
-6. Add data versioning endpoints
-7. Add monitoring endpoints
-8. Add rate limit configuration endpoints
-9. Add webhook configuration endpoints
-10. Add data validation endpoints
+Common error codes:
+- `INVALID_REQUEST`: Invalid request parameters
+- `NOT_FOUND`: Resource not found
+- `RATE_LIMITED`: Too many requests
+- `SERVER_ERROR`: Internal server error
+
+## Rate Limiting
+- 100 requests per minute per IP
+- Rate limit headers included in response
+- Exponential backoff recommended for retries

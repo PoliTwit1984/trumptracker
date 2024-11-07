@@ -1,8 +1,23 @@
 import PropTypes from 'prop-types';
-import { Card, CardContent, Typography, Box } from '@mui/material';
+import { Card, CardContent, Typography, Box, IconButton, Collapse } from '@mui/material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useState } from 'react';
+import { styled } from '@mui/material/styles';
+
+const ExpandMore = styled((props) => {
+  const { expand, ...other } = props;
+  return <IconButton {...other} sx={{ transform: expand ? 'rotate(180deg)' : 'rotate(0deg)' }} />;
+})(({ theme }) => ({
+  marginLeft: 'auto',
+  transition: theme.transitions.create('transform', {
+    duration: theme.transitions.duration.shortest,
+  }),
+}));
 
 function InflationPromiseCard({ promise }) {
+  const [expanded, setExpanded] = useState(false);
+
   if (!promise) {
     console.error('No promise data provided to InflationPromiseCard');
     return null;
@@ -23,6 +38,10 @@ function InflationPromiseCard({ promise }) {
   const getValueColor = (percentage) => {
     if (typeof percentage !== 'number') return 'text.primary';
     return percentage > 0 ? 'error.main' : 'success.main';
+  };
+
+  const handleExpandClick = () => {
+    setExpanded(!expanded);
   };
 
   return (
@@ -99,11 +118,46 @@ function InflationPromiseCard({ promise }) {
           </Box>
         )}
 
-        <Box sx={{ mt: 2 }}>
+        <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography variant="body2" color="text.secondary">
             Last Updated: {promise.last_updated || 'Unknown'}
           </Typography>
+          {promise.analysis && (
+            <ExpandMore
+              expand={expanded}
+              onClick={handleExpandClick}
+              aria-expanded={expanded}
+              aria-label="show analysis"
+              size="small"
+            >
+              <ExpandMoreIcon />
+            </ExpandMore>
+          )}
         </Box>
+
+        <Collapse in={expanded} timeout="auto" unmountOnExit>
+          <Box sx={{ 
+            mt: 2, 
+            p: 2, 
+            bgcolor: 'rgba(255, 255, 255, 0.05)', 
+            borderRadius: 1,
+            border: '1px solid rgba(255, 255, 255, 0.1)'
+          }}>
+            <Typography 
+              variant="body2" 
+              component="pre" 
+              sx={{ 
+                whiteSpace: 'pre-wrap',
+                fontFamily: 'inherit',
+                mb: 0,
+                color: 'rgba(255, 255, 255, 0.9)',
+                lineHeight: 1.6
+              }}
+            >
+              {promise.analysis}
+            </Typography>
+          </Box>
+        </Collapse>
       </CardContent>
     </Card>
   );

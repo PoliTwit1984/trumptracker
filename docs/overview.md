@@ -1,74 +1,138 @@
 # Trump Tracker Overview
 
-## Data Management Strategy
+## Project Purpose
+Trump Tracker is a comprehensive platform designed to monitor and analyze economic metrics and campaign promises related to inflation and economic policies. The system provides real-time tracking of key economic indicators while maintaining a record of related campaign promises and their fulfillment status.
 
-### Local Database Storage
-- FRED economic data is stored in a local SQLite database
-- Data is not real-time and updates on different schedules:
-  - CPI: Monthly updates
-  - Core CPI: Monthly updates
-  - Food Price Index: Monthly updates
-  - Gas Prices: Weekly updates
-  - Housing Price Index: Monthly updates
-- Database is used to serve requests instead of making API calls on each visit
-- FRED API is only called when new data is available based on update schedule
+## Core Features
 
-### Data Update Process
-1. Initial data load: Historical data is fetched from FRED API and stored in database
-2. Periodic updates:
-   - Weekly job for gas prices
-   - Monthly job for other metrics
-3. All user requests are served from the local database
-4. FRED API is only called during scheduled updates
+### Inflation Metrics Dashboard
+- Real-time tracking of key economic indicators
+- Interactive data visualization
+- AI-powered analysis using Claude
+- Historical data comparison
+- Regular data updates from FRED API
 
-## Project Status
+### Campaign Promise Tracker
+- Categorized promise listing
+- Status tracking with visual indicators
+- Source verification links
+- Progress monitoring
+- Historical record keeping
 
-### Recently Completed
-- Implemented SQLite database for storing FRED economic data
-- Added data caching layer to prevent excessive API calls
-- Improved error handling and validation
-- Added proper PropTypes validation for React components
-- Implemented data transformation layer
-- Added detailed logging
-- Implemented analysis caching
-- Added charts for historical data visualization
+## System Architecture
 
-### In Progress
-- Implementing automated data updates based on metric schedules
-- Adding more comprehensive error handling
-- Improving data validation
+### Frontend
+- React-based single-page application
+- Material-UI components for consistent design
+- Responsive layout for all devices
+- Real-time data updates
+- Interactive data visualization
 
-### To Do
-- Implement automated weekly updates for gas prices
-- Implement automated monthly updates for other metrics
-- Add update schedule configuration
-- Add data freshness monitoring
-- Implement database backup functionality
-- Add data export capabilities
-- Implement user authentication
-- Add admin dashboard for data management
-- Add more comprehensive testing
-- Implement data versioning
-- Add data comparison features
-- Implement automated deployment pipeline
-- Add monitoring and alerting
-- Implement rate limiting for public API endpoints
+### Backend
+- Flask-based REST API
+- FRED API integration
+- Claude AI integration for analysis
+- SQLite database for data storage
+- Automated data updates
 
-## Project Goals
-1. Track and analyze economic metrics during Trump's presidency
-2. Provide accurate economic indicators with appropriate update frequencies
-3. Compare historical data with current trends
-4. Provide AI-powered analysis of economic trends
-5. Ensure data accuracy and reliability
-6. Make economic data accessible and understandable
+## Current Implementation
 
-## Architecture Overview
-- Frontend: React with Material-UI
-- Backend: Python Flask API
-- Database: SQLite for local data storage
-- External APIs: 
-  - FRED API for periodic data updates
-  - Claude API for analysis
-- Caching: 
-  - SQLite for persistent data storage
-  - In-memory caching for analysis
+### Metrics Tracking
+- Consumer Price Index (CPI)
+- Core CPI (excluding food and energy)
+- Food Price Index
+- Gas Prices
+- Housing Price Index
+
+### Promise Categories
+- Core Inflation Promises
+- Energy Costs
+- Tax Measures
+- Trade Policy
+- Housing Affordability
+
+### UI Features
+- Expandable metric cards with detailed analysis
+- Interactive charts and visualizations
+- Status indicators for promises
+- Source verification links
+- Category-based organization
+
+## Planned Enhancements
+
+### Database Migration
+1. Campaign Promises Storage
+   - Move promises from static file to database
+   - Implement CRUD operations
+   - Add status change tracking
+   - Enable dynamic updates
+
+### Feature Additions
+1. User Management
+   - Authentication system
+   - Role-based access control
+   - Admin dashboard
+   - User preferences
+
+2. Enhanced Analytics
+   - Comparative analysis tools
+   - Custom date ranges
+   - Trend predictions
+   - Export capabilities
+
+3. Notification System
+   - Status change alerts
+   - Metric threshold notifications
+   - Email updates
+   - Custom alert settings
+
+### Technical Improvements
+1. Performance
+   - Implement caching
+   - Optimize data fetching
+   - Add lazy loading
+   - Improve response times
+
+2. Testing
+   - Expand test coverage
+   - Add integration tests
+   - Implement E2E testing
+   - Performance testing
+
+3. Documentation
+   - API documentation
+   - User guides
+   - Development guides
+   - Deployment documentation
+
+## Getting Started
+
+### Prerequisites
+- Node.js 16+
+- Python 3.8+
+- SQLite 3
+
+### Environment Setup
+1. Clone repository
+2. Install dependencies
+3. Set up environment variables
+4. Initialize database
+5. Start development servers
+
+### Development Workflow
+1. Frontend development (Vite + React)
+2. Backend development (Flask)
+3. Database management (SQLite)
+4. Testing and validation
+5. Documentation updates
+
+## Contributing
+- Fork repository
+- Create feature branch
+- Submit pull request
+- Follow coding standards
+- Include tests
+- Update documentation
+
+## License
+MIT License - See LICENSE file for details

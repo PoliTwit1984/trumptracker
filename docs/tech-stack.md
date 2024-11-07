@@ -1,124 +1,124 @@
 # Technology Stack
 
-## Backend
-
-### Core
-- **Python 3.8+**: Main programming language
-- **Flask**: Web framework
-- **SQLite**: Database
-- **SQLAlchemy**: ORM and database toolkit
-
-### APIs
-- **FRED API**: Federal Reserve Economic Data
-- **Claude API**: AI analysis via Anthropic
-
-### Libraries
-- **fredapi**: FRED API client
-- **anthropic**: Claude API client
-- **pandas**: Data manipulation and analysis
-- **numpy**: Numerical computations
-- **flask-limiter**: Rate limiting
-- **flask-cors**: CORS handling
-- **python-dotenv**: Environment variable management
-- **pytest**: Testing framework
-- **logging**: Built-in logging
-
 ## Frontend
 
-### Core
-- **React**: UI framework
+### Core Technologies
+- **React**: Frontend framework for building user interfaces
 - **Vite**: Build tool and development server
-- **JavaScript/ES6+**: Programming language
+- **Material-UI (MUI)**: UI component library
+  - Used for layout, cards, navigation, and styling
+  - Custom theme implementation
+  - Responsive design components
 
-### UI Components
-- **Material-UI (MUI)**: Component library
-- **Recharts**: Charting library
+### Key Libraries
+- **Axios**: HTTP client for API requests
+- **Recharts**: Charting library for data visualization
+- **PropTypes**: Runtime type checking for React props
 
 ### State Management
-- **React Hooks**: Local state management
-- **useEffect**: Side effect handling
-- **useCallback**: Performance optimization
+- React's built-in useState and useEffect hooks
+- Custom hooks for data fetching and state management
 
-### HTTP Client
-- **Axios**: HTTP requests
+## Backend
 
-### Development Tools
-- **ESLint**: Code linting
-- **PropTypes**: Runtime type checking
+### Core Technologies
+- **Python**: Primary backend language
+- **Flask**: Web framework
+- **SQLite**: Database system
+
+### Key Libraries
+- **Anthropic Claude**: AI model for data analysis
+- **FRED API**: Federal Reserve Economic Data API
+- **SQLAlchemy**: SQL toolkit and ORM
+
+### Data Processing
+- **Pandas**: Data manipulation and analysis
+- **NumPy**: Numerical computing tools
 
 ## Development Tools
 
 ### Version Control
-- **Git**: Source control
-- **GitHub**: Repository hosting
+- **Git**: Source control management
+- **GitHub**: Repository hosting and collaboration
 
-### IDE
-- **VSCode**: Primary development environment
-  - ESLint extension
-  - Python extension
-  - Git extension
-  - React extension
+### Development Environment
+- **VSCode**: Primary IDE
+- **ESLint**: JavaScript linting
+- **Prettier**: Code formatting
 
 ### Testing
-- **pytest**: Backend testing
-- **pytest-cov**: Test coverage
-- **React Testing Library**: Frontend testing (planned)
-
-### Documentation
-- **Markdown**: Documentation format
-- **JSDoc**: JavaScript documentation
+- **Jest**: Frontend testing framework
+- **Pytest**: Backend testing framework
 
 ## Infrastructure
 
 ### Database
 - **SQLite**: Local database
-- **SQLAlchemy**: Database ORM
-- **Alembic**: Database migrations (planned)
+  - FRED series data
+  - Historical data points
+  - Analysis results
+  - (Planned) Campaign promises storage
 
-### Caching
-- **In-memory caching**: API response caching
-- **SQLite**: Data persistence
+### API Architecture
+- RESTful API design
+- JSON data format
+- CORS enabled for development
 
-### Monitoring (Planned)
-- **Logging**: Application logging
-- **Metrics**: Performance monitoring
-- **Alerts**: Error alerting
-- **Health checks**: Service health monitoring
+## Planned Additions
 
-## To Do
+### Database Enhancements
+1. Campaign Promises Storage
+   - Promise details
+   - Status tracking
+   - Source management
+   - Completion history
 
-### Backend
-1. Add database migrations with Alembic
-2. Add Celery for background tasks
-3. Add Redis for caching
-4. Add Prometheus for metrics
-5. Add Grafana for monitoring
-6. Add Sentry for error tracking
-7. Add OpenAPI/Swagger for API docs
-8. Add JWT for authentication
-9. Add pytest-asyncio for async testing
-10. Add mypy for static typing
+### Authentication & Authorization
+1. User Management
+   - JWT authentication
+   - Role-based access control
+   - Session management
 
-### Frontend
-1. Add TypeScript
-2. Add React Testing Library
-3. Add Cypress for E2E testing
-4. Add Redux for state management
-5. Add Storybook for component docs
-6. Add React Query for data fetching
-7. Add React Router for routing
-8. Add React Error Boundary
-9. Add PWA support
-10. Add service workers
+### Caching Layer
+1. Performance Optimization
+   - Redis integration
+   - API response caching
+   - Session storage
 
-### Infrastructure
-1. Add Docker containerization
-2. Add Kubernetes orchestration
-3. Add CI/CD pipeline
-4. Add automated deployments
-5. Add infrastructure as code
-6. Add security scanning
-7. Add performance monitoring
-8. Add load balancing
-9. Add CDN integration
-10. Add backup solution
+### Monitoring & Logging
+1. System Health
+   - Prometheus metrics
+   - Grafana dashboards
+   - Error tracking
+
+### CI/CD Pipeline
+1. Automated Deployment
+   - GitHub Actions
+   - Automated testing
+   - Deployment automation
+
+## Development Practices
+
+### Code Quality
+- ESLint configuration
+- Prettier formatting
+- Type checking with PropTypes
+- Python type hints
+
+### Testing Strategy
+- Unit tests for components
+- Integration tests for API
+- End-to-end testing
+- Continuous integration
+
+### Documentation
+- Inline code documentation
+- API documentation
+- Component documentation
+- Setup guides
+
+### Security
+- CORS configuration
+- Input validation
+- Data sanitization
+- Rate limiting

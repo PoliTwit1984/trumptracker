@@ -163,13 +163,16 @@ class FREDDataFetcher:
                             continue
                     
                     result_data[name] = {
+                        'series_id': series_id,  # Include series_id in the result
                         'current_value': latest_value,
                         'baseline_value': baseline_value,
                         'percentage_change': float(percentage_change),
                         'historical_data': historical_data,
                         'title': series_info.title,
                         'units': series_info.units,
-                        'last_updated': series_info.last_updated.strftime('%Y-%m-%d')
+                        'last_updated': series_info.last_updated.strftime('%Y-%m-%d'),
+                        'analysis': series_info.latest_analysis,
+                        'analysis_timestamp': series_info.analysis_timestamp.strftime('%Y-%m-%d %H:%M:%S') if series_info.analysis_timestamp else None
                     }
                     logger.info(f"Successfully processed data for series {series_id}")
                 except Exception as e:
@@ -192,6 +195,9 @@ class FREDDataFetcher:
         """Fetch and store complete historical data for all series with validation."""
         session = get_session()
         try:
+            # Set end_date to ensure we get the most recent data
+            end_date = datetime.now() + timedelta(days=30)  # Look ahead to get any future releases
+            
             for series_id in SERIES_IDS.values():
                 self._validate_series_id(series_id)
                 logger.info(f"Fetching historical data for {series_id}")
@@ -200,10 +206,11 @@ class FREDDataFetcher:
                 if start_date:
                     start_date = self._validate_date(start_date)
                 
-                # Get series data from FRED
+                # Get series data from FRED with specific end date
                 series = self.fred.get_series(
                     series_id,
-                    observation_start=start_date
+                    observation_start=start_date,
+                    observation_end=end_date
                 )
                 
                 # Convert to list for validation
@@ -248,6 +255,9 @@ class FREDDataFetcher:
         """Check and update data for all series with validation."""
         session = get_session()
         try:
+            # Set end_date to ensure we get the most recent data
+            end_date = datetime.now() + timedelta(days=30)  # Look ahead to get any future releases
+            
             for series_id in SERIES_IDS.values():
                 self._validate_series_id(series_id)
                 
@@ -262,10 +272,11 @@ class FREDDataFetcher:
                 else:
                     start_date = self._validate_date(HISTORICAL_START_DATES.get(series_id))
                 
-                # Fetch new data from FRED
+                # Fetch new data from FRED with specific end date
                 series = self.fred.get_series(
                     series_id,
-                    observation_start=start_date
+                    observation_start=start_date,
+                    observation_end=end_date
                 )
                 
                 if series is None or len(series) == 0:

@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime, Index
+from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime, Index, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
@@ -28,6 +28,8 @@ class FREDSeries(Base):
     units = Column(String)
     last_updated = Column(DateTime)
     frequency = Column(String)
+    latest_analysis = Column(Text)  # New column for storing AI analysis
+    analysis_timestamp = Column(DateTime)  # New column for tracking when analysis was performed
     
     def __repr__(self):
         return f"<FREDSeries(series_id='{self.series_id}', title='{self.title}')>"
@@ -103,6 +105,23 @@ def store_series_data(session, series_id: str, data_points: list, metadata: dict
     except Exception as e:
         session.rollback()
         logger.error(f"Error storing data for series {series_id}: {str(e)}")
+        raise
+
+def store_series_analysis(session, series_id: str, analysis: str):
+    """Store AI analysis for a series"""
+    try:
+        series = session.query(FREDSeries).filter_by(series_id=series_id).first()
+        if series:
+            series.latest_analysis = analysis
+            series.analysis_timestamp = datetime.now()
+            session.commit()
+            logger.info(f"Successfully stored analysis for series {series_id}")
+        else:
+            logger.error(f"Series {series_id} not found")
+            raise ValueError(f"Series {series_id} not found")
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Error storing analysis for series {series_id}: {str(e)}")
         raise
 
 def get_series_data(session, series_id: str, start_date=None, end_date=None):

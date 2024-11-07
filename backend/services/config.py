@@ -20,11 +20,11 @@ SERIES_IDS = {
     'housing': 'CSUSHPISA'       # Case-Shiller Home Price Index
 }
 
-# Historical data start dates
+# Historical data start dates - Updated to get more recent data
 HISTORICAL_START_DATES = {
-    'CPIAUCSL': '2020-01-01',
-    'CPILFESL': '2020-01-01',
-    'CPIUFDSL': '2020-01-01',
-    'GASREGW': '2020-01-01',
-    'CSUSHPISA': '2020-01-01'
+    'CPIAUCSL': '2024-01-01',    # Monthly, released on 13th
+    'CPILFESL': '2024-01-01',    # Monthly, released on 13th
+    'CPIUFDSL': '2024-01-01',    # Monthly, released on 13th
+    'GASREGW': '2024-01-01',     # Weekly, released on Tuesday
+    'CSUSHPISA': '2024-01-01'    # Monthly, released on last Tuesday
 }
