@@ -1,0 +1,47 @@
+[run]
+# Configure what to measure
+branch = True
+source = .
+omit =
+    # Omit test files
+    */tests/*
+    # Omit virtual environment files
+    */venv/*
+    # Omit setup files
+    setup.py
+    # Omit init files
+    */__init__.py
+    # Omit configuration files
+    */config.py
+
+[report]
+# Configure the coverage report
+exclude_lines =
+    # Skip any pass statements
+    pass
+    # Skip defensive assertion code
+    raise AssertionError
+    raise NotImplementedError
+    # Skip unimplemented abstract methods
+    @abstractmethod
+    # Skip debug-only code
+    def __repr__
+    if self\.debug
+    # Skip main block
+    if __name__ == .__main__.:
+    # Skip type checking imports
+    if TYPE_CHECKING:
+
+# Set coverage checking thresholds
+fail_under = 90
+precision = 2
+show_missing = True
+
+# Configure coverage categories
+skip_covered = True
+skip_empty = True
+
+[html]
+# Configure HTML report
+directory = coverage_html
+title = Trump Tracker Test Coverage Report

@@ -1,0 +1,17 @@
+pyproject.toml
+setup.py
+services/__init__.py
+services/config.py
+services/data_analyzer.py
+services/data_fetcher.py
+services/inflation_tracker.py
+tests/__init__.py
+tests/conftest.py
+tests/test_app.py
+tests/test_data_analyzer.py
+tests/test_data_fetcher.py
+tests/test_inflation_tracker.py
+trumptracker.egg-info/PKG-INFO
+trumptracker.egg-info/SOURCES.txt
+trumptracker.egg-info/dependency_links.txt
+trumptracker.egg-info/top_level.txt

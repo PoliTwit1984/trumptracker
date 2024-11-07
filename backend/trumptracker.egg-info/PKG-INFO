@@ -1,0 +1,5 @@
+Metadata-Version: 2.1
+Name: trumptracker
+Version: 1.0.0
+Summary: Trump economic promises tracker
+Requires-Python: >=3.8

@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trumptracker"
+version = "1.0.0"
+description = "Trump economic promises tracker"
+requires-python = ">=3.8"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "--cov=services --cov=app --cov-report=term-missing --cov-fail-under=80 -v"
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["services", "app"]
+omit = ["tests/*"]
