@@ -1,16 +1,15 @@
 import os
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
 
 def get_fred_api_key() -> str:
     """Get FRED API key from environment variables."""
-    return os.getenv('FRED_API_KEY', '')
+    api_key = os.getenv('FRED_API_KEY', '')
+    if not api_key:
+        raise ValueError("FRED_API_KEY environment variable is not set")
+    return api_key
 
 def get_claude_model() -> str:
     """Get Claude model name from environment variables."""
-    return os.getenv('CLAUDE_MODEL', 'claude-3-opus-20240229')
+    return os.getenv('CLAUDE_MODEL', 'claude-3-5-sonnet-20241022')
 
 # FRED API Series IDs
 SERIES_IDS = {

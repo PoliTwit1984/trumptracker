@@ -1,2 +1,5 @@
+api
+core
+middleware
 services
 tests

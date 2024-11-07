@@ -1,235 +1,107 @@
-import {
-  Card,
-  CardContent,
-  Typography,
-  Box,
-  Chip,
-  CircularProgress,
-  Alert,
-  Tooltip,
-  IconButton,
-  Collapse,
-  Link,
-} from '@mui/material';
-import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { LineChart, Line, XAxis, YAxis, Tooltip as ChartTooltip, ResponsiveContainer } from 'recharts';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import axios from 'axios';
+import { Card, CardContent, Typography, Box } from '@mui/material';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const MetricCard = ({ title, value, baselineValue, change, units }) => (
-  <Tooltip title={`${title} - measured in ${units}`} arrow>
-    <Box sx={{ mb: 2, p: 1, bgcolor: 'background.paper', borderRadius: 1, cursor: 'help' }}>
-      <Typography variant="h6">
-        {value.toFixed(2)} {units}
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        Year ago: {baselineValue.toFixed(2)} {units}
-      </Typography>
-      <Typography
-        variant="body2"
-        color={change >= 0 ? 'error.main' : 'success.main'}
-      >
-        {change >= 0 ? '+' : ''}{change.toFixed(2)}% year-over-year
-      </Typography>
-    </Box>
-  </Tooltip>
-);
+function InflationPromiseCard({ promise }) {
+  if (!promise) {
+    console.error('No promise data provided to InflationPromiseCard');
+    return null;
+  }
 
-MetricCard.propTypes = {
-  title: PropTypes.string.isRequired,
-  value: PropTypes.number.isRequired,
-  baselineValue: PropTypes.number.isRequired,
-  change: PropTypes.number.isRequired,
-  units: PropTypes.string.isRequired,
-};
+  console.log('Rendering InflationPromiseCard with data:', promise);
 
-const getMetricDetails = (metricType) => {
-  const details = {
-    cpi: {
-      name: 'CPI-U (Consumer Price Index for All Urban Consumers)',
-      description: 'Overall inflation',
-      frequency: 'Monthly'
-    },
-    core_cpi: {
-      name: 'Core CPI (excluding food and energy)',
-      description: 'Underlying inflation trends',
-      frequency: 'Monthly'
-    },
-    food: {
-      name: 'Food CPI',
-      description: 'Food price inflation',
-      frequency: 'Monthly'
-    },
-    gas: {
-      name: 'Regular Gas Prices',
-      description: 'National average gas prices',
-      frequency: 'Weekly'
-    },
-    housing: {
-      name: 'Case-Shiller Home Price Index',
-      description: 'Housing market trends',
-      frequency: 'Monthly'
-    }
+  const formatValue = (value) => {
+    if (typeof value !== 'number') return 'N/A';
+    return value.toFixed(2);
   };
-  return details[metricType] || { name: 'Unknown metric', description: '', frequency: '' };
-};
 
-function InflationPromiseCard({ promise, metricType }) {
-  const [inflationData, setInflationData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [expanded, setExpanded] = useState(false);
+  const formatPercentage = (value) => {
+    if (typeof value !== 'number') return 'N/A';
+    return `${value > 0 ? '+' : ''}${value.toFixed(2)}%`;
+  };
 
-  useEffect(() => {
-    const fetchInflationData = async () => {
-      try {
-        const response = await axios.get('http://localhost:5001/api/inflation-data');
-        setInflationData(response.data);
-        setLoading(false);
-      } catch (error) {
-        setError('Failed to fetch inflation data');
-        setLoading(false);
-        console.error('Error fetching inflation data:', error);
-      }
-    };
-
-    fetchInflationData();
-    // Refresh data every hour
-    const interval = setInterval(fetchInflationData, 3600000);
-    return () => clearInterval(interval);
-  }, []);
-
-  if (loading) {
-    return (
-      <Card sx={{ minHeight: 300, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <CircularProgress />
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card sx={{ minHeight: 300 }}>
-        <CardContent>
-          <Alert severity="error">{error}</Alert>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const metrics = inflationData?.metrics || {};
-  const metric = metrics[metricType];
-  
-  if (!metric) {
-    return (
-      <Card sx={{ minHeight: 300 }}>
-        <CardContent>
-          <Alert severity="error">Metric data not found</Alert>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const status = metric.percentage_change >= 0 ? 'Worsening' : 'Improving';
-  const metricDetails = getMetricDetails(metricType);
+  const getValueColor = (percentage) => {
+    if (typeof percentage !== 'number') return 'text.primary';
+    return percentage > 0 ? 'error.main' : 'success.main';
+  };
 
   return (
-    <Card sx={{ minHeight: 300 }}>
-      <CardContent>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-          <Typography variant="h6" component="div">
-            {promise.title}
-          </Typography>
-          <Chip
-            label={status}
-            color={status === 'Improving' ? 'success' : 'error'}
-            sx={{ ml: 1 }}
-          />
-        </Box>
-
-        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
-          Analysis as of November 5th, 2024 (Day after Election)
+    <Card sx={{ 
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      bgcolor: 'background.paper',
+      borderRadius: 2,
+      boxShadow: 3
+    }}>
+      <CardContent sx={{ flexGrow: 1 }}>
+        <Typography variant="h6" component="div" gutterBottom>
+          {promise.title || 'Unknown Metric'}
         </Typography>
-
-        <MetricCard
-          title={metric.title}
-          value={metric.current_value}
-          baselineValue={metric.baseline_value}
-          change={metric.percentage_change}
-          units={metric.units}
-        />
-
-        <Box sx={{ mt: 3, height: 200 }}>
-          <Typography variant="subtitle2" gutterBottom>
-            Price Trend
+        
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary">
+            Current Value
           </Typography>
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              data={metric.historical_data}
-              margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
-            >
-              <Line
-                type="monotone"
-                dataKey="value"
-                name={metric.title}
-                stroke="#8884d8"
-                dot={false}
-              />
-              <XAxis
-                dataKey="date"
-                tickFormatter={(date) => new Date(date).toLocaleDateString()}
-              />
-              <YAxis />
-              <ChartTooltip
-                labelFormatter={(date) => new Date(date).toLocaleDateString()}
-                formatter={(value) => [value.toFixed(2), metric.title]}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <Typography variant="h4" component="div">
+            {formatValue(promise.current_value)}
+            <Typography component="span" variant="body2" sx={{ ml: 1 }}>
+              {promise.units}
+            </Typography>
+          </Typography>
         </Box>
 
-        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="caption" color="text.secondary">
-            Last updated: {new Date(inflationData.last_updated).toLocaleString()}
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary">
+            Change from Previous Year
           </Typography>
-          <IconButton
-            onClick={() => setExpanded(!expanded)}
-            sx={{
-              transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
-              transition: 'transform 0.3s',
-            }}
-            aria-expanded={expanded}
-            aria-label="show analysis"
+          <Typography 
+            variant="h5" 
+            component="div"
+            sx={{ color: getValueColor(promise.percentage_change) }}
           >
-            <ExpandMoreIcon />
-          </IconButton>
+            {formatPercentage(promise.percentage_change)}
+          </Typography>
         </Box>
 
-        <Collapse in={expanded} timeout="auto" unmountOnExit>
-          <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
-            <Typography variant="h6" gutterBottom>
-              AI Analysis
-            </Typography>
-            <Typography variant="body2" paragraph>
-              {inflationData.analysis}
-            </Typography>
+        {promise.historical_data && promise.historical_data.length > 0 && (
+          <Box sx={{ height: 200, mt: 3 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={promise.historical_data}
+                margin={{
+                  top: 5,
+                  right: 5,
+                  left: 5,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="date" 
+                  tick={{ fontSize: 12 }}
+                  interval="preserveStartEnd"
+                />
+                <YAxis 
+                  tick={{ fontSize: 12 }}
+                  domain={['auto', 'auto']}
+                />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#8884d8"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </Box>
-        </Collapse>
+        )}
 
-        <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid rgba(0, 0, 0, 0.12)' }}>
-          <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
-            Data source: {' '}
-            <Link 
-              href="https://fred.stlouisfed.org/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-            >
-              Federal Reserve Economic Data (FRED)
-            </Link>
-          </Typography>
-          <Typography variant="caption" color="text.secondary" display="block">
-            Metric: {metricDetails.name} - {metricDetails.description} ({metricDetails.frequency} data)
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="body2" color="text.secondary">
+            Last Updated: {promise.last_updated || 'Unknown'}
           </Typography>
         </Box>
       </CardContent>
@@ -239,13 +111,23 @@ function InflationPromiseCard({ promise, metricType }) {
 
 InflationPromiseCard.propTypes = {
   promise: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    title: PropTypes.string.isRequired,
-    category: PropTypes.string.isRequired,
-    status: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-  }).isRequired,
-  metricType: PropTypes.string.isRequired,
+    id: PropTypes.string,
+    title: PropTypes.string,
+    description: PropTypes.string,
+    metric_type: PropTypes.string,
+    current_value: PropTypes.number,
+    baseline_value: PropTypes.number,
+    percentage_change: PropTypes.number,
+    historical_data: PropTypes.arrayOf(
+      PropTypes.shape({
+        date: PropTypes.string,
+        value: PropTypes.number
+      })
+    ),
+    units: PropTypes.string,
+    last_updated: PropTypes.string,
+    analysis: PropTypes.string
+  }).isRequired
 };
 
 export default InflationPromiseCard;

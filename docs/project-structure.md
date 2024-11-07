@@ -1,106 +1,82 @@
 # Project Structure
 
-```
-trumptracker/
-├── backend/
-│   ├── app.py                 # Flask server and API endpoints
-│   ├── fred_api.py           # FRED API wrapper
-│   ├── database.py           # Database models and operations
-│   ├── services/             # Modular service components
-│   │   ├── __init__.py       # Service package exports
-│   │   ├── config.py         # Configuration and constants
-│   │   ├── data_fetcher.py   # FRED data fetching (13.22% coverage)
-│   │   ├── data_analyzer.py  # Claude AI analysis (15.18% coverage)
-│   │   ├── inflation_tracker.py # Service coordinator
-│   │   ├── exceptions.py     # Custom exception definitions
-│   │   ├── decorators.py     # Utility decorators (81.82% coverage)
-│   │   └── validators.py     # Data validation (86.84% coverage)
-│   ├── tests/               # Test suite
-│   │   ├── conftest.py      # Test configuration and fixtures
-│   │   ├── test_app.py      # API endpoint tests
-│   │   ├── test_data_analyzer.py # AI analysis tests
-│   │   ├── test_data_fetcher.py # FRED data tests
-│   │   └── test_inflation_tracker.py # Service tests
-│   └── .coveragerc          # Coverage configuration
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── Dashboard.jsx      # Main dashboard layout
-│   │   │   ├── PromiseMenu.jsx    # Navigation menu component
-│   │   │   ├── PromiseCard.jsx    # Generic promise display
-│   │   │   └── InflationPromiseCard.jsx # Economic indicator cards
-│   │   ├── App.jsx           # Root component
-│   │   └── index.css         # Global styles
-│   ├── package.json          # Frontend dependencies
-│   └── vite.config.js        # Vite configuration
-├── docs/                    # Project documentation
-│   ├── overview.md          # Project overview and features
-│   ├── tech-stack.md        # Technology stack details
-│   ├── backend-architecture.md # Backend design and components
-│   ├── project-structure.md # Directory structure
-│   ├── api-docs.md         # API documentation
-│   ├── components.md       # Frontend component docs
-│   └── setup.md           # Setup instructions
-└── README.md               # Project documentation
-```
+## Backend
 
-## Key Features
+### Core (`backend/core/`)
+- `config.py`: Application configuration and environment variables
+- `exceptions.py`: Custom exception classes
+- `factory.py`: Flask application factory
 
-### Backend Organization
-- Modular service architecture
-- Clear separation of concerns
-- Comprehensive test coverage
-- Isolated components
-- Centralized configuration
-- Custom error handling
-- Utility functions
-- Data validation
+### API (`backend/api/`)
+- `routes.py`: API endpoint definitions and handlers
 
-### Frontend Structure
-- Component-based architecture
-- Reusable UI elements
-- Centralized state management
-- Consistent styling
-- Error handling
-- Loading states
-- Data visualization
+### Services (`backend/services/`)
+- `data_fetcher.py`: FRED API interaction and data retrieval
+- `data_analyzer.py`: AI analysis using Claude API
+- `inflation_tracker.py`: Main business logic
+- `config.py`: Service-specific configuration
+- `decorators.py`: Service utility decorators
+- `validators.py`: Data validation utilities
+- `exceptions.py`: Service-specific exceptions
 
-### Documentation
-- Comprehensive guides
-- API documentation
-- Setup instructions
-- Architecture overview
-- Component documentation
-- Testing guidelines
+### Database
+- `database.py`: Database models and utilities
+- `fred_data.db`: SQLite database file
 
-### Testing
-- Unit tests
-- Integration tests
-- Test fixtures
-- Mock objects
-- Coverage reporting
-- Automated testing
-- Test configuration
+### Tests (`backend/tests/`)
+- `conftest.py`: Test configuration
+- `test_app.py`: API tests
+- `test_data_analyzer.py`: Analysis service tests
+- `test_data_fetcher.py`: Data fetcher tests
+- `test_inflation_tracker.py`: Business logic tests
 
-## Module Descriptions
+### Middleware (`backend/middleware/`)
+- `security.py`: Security middleware and request logging
 
-### Backend Services
-- **config.py**: Configuration management and constants
-- **data_fetcher.py**: FRED API integration and data management
-- **data_analyzer.py**: AI-powered economic analysis
-- **inflation_tracker.py**: Service coordination and orchestration
-- **exceptions.py**: Custom error handling
-- **decorators.py**: Utility decorators and function wrappers
-- **validators.py**: Data validation and verification
+## Frontend
 
-### Frontend Components
-- **Dashboard.jsx**: Main application layout
-- **PromiseMenu.jsx**: Navigation and filtering
-- **PromiseCard.jsx**: Generic promise display
-- **InflationPromiseCard.jsx**: Economic data visualization
+### Components (`frontend/src/components/`)
+- `Dashboard.jsx`: Main dashboard component
+- `InflationPromiseCard.jsx`: Individual metric display
+- `PromiseMenu.jsx`: Navigation menu
 
-### Documentation
-- Organized by topic
-- Regular updates
-- Clear structure
-- Comprehensive coverage
+### Assets (`frontend/src/assets/`)
+- Static assets and images
+
+### Styles (`frontend/src/`)
+- `App.css`: Application styles
+- `index.css`: Global styles
+
+### Configuration
+- `vite.config.js`: Vite configuration
+- `package.json`: Dependencies and scripts
+- `eslint.config.js`: ESLint configuration
+
+## Documentation (`docs/`)
+- `overview.md`: Project overview and status
+- `backend-architecture.md`: Backend architecture details
+- `api-docs.md`: API documentation
+- `setup.md`: Setup instructions
+- `tech-stack.md`: Technology stack details
+- `project-structure.md`: This file
+- `components.md`: Frontend component documentation
+
+## Root Files
+- `.gitignore`: Git ignore rules
+- `requirements.txt`: Python dependencies
+- `README.md`: Project readme
+- `promise.md`: Promise tracking documentation
+
+## To Do
+1. Add frontend testing directory
+2. Add frontend state management
+3. Add frontend error boundary components
+4. Add frontend service layer
+5. Add frontend type definitions
+6. Add frontend documentation
+7. Add backend API versioning
+8. Add backend database migrations
+9. Add backend job scheduling
+10. Add deployment configuration
+11. Add monitoring configuration
+12. Add CI/CD configuration

@@ -1,110 +1,113 @@
 # Backend Architecture
 
-The backend follows a modular service-oriented architecture designed for maintainability, testability, and scalability.
+## Core Components
 
-## Core Services
+### Database Layer
+- SQLite database for storing FRED economic data
+- Tables:
+  - `fred_series`: Stores metadata about economic indicators
+  - `fred_data`: Stores historical data points for each series
+- Indexes for optimized querying
+- Connection pooling for better performance
+- Data is updated on different schedules:
+  - Weekly: Gas prices
+  - Monthly: CPI, Core CPI, Food Index, Housing Index
 
-### config.py
-- Environment variable management
-- FRED API series configurations
-- Historical data settings
+### Data Management
+- Data is primarily served from local database
+- FRED API is only called during scheduled updates
+- Update frequency varies by metric type
+- Historical data is preserved for trend analysis
+- Data validation ensures consistency
 
-### data_fetcher.py (13.22% test coverage)
-- Historical data fetching
-- Daily updates
-- Data formatting and processing
-- Comprehensive error handling
-- FRED API integration
-- Database operations
+### Data Fetching
+- `FREDDataFetcher` class handles all FRED API interactions
+- Only fetches new data during scheduled updates
+- Validates and transforms data before storage
+- Handles rate limiting and retries
+- Implements exponential backoff for failed requests
 
-### data_analyzer.py (15.18% test coverage)
-- Claude AI integration
-- Trend analysis
-- Economic insights generation
-- Error handling and validation
-- AI prompt management
-- Response validation
+### Data Analysis
+- `InflationAnalyzer` class handles AI-powered analysis
+- Uses Claude API for trend analysis
+- Implements caching to reduce API costs
+- Validates and sanitizes analysis results
+- Handles rate limiting gracefully
 
-### inflation_tracker.py
-- Service orchestration
-- API response formatting
-- Status tracking and updates
-- Service initialization
-- Data validation
-- Error handling
+### API Layer
+- Flask-based REST API
+- Endpoints:
+  - `/api/v1/inflation/data`: Get current inflation metrics (from database)
+  - `/api/v1/inflation/initialize`: Initialize historical data
+  - `/api/v1/inflation/update`: Update with latest data (scheduled)
+  - `/api/v1/inflation/backup`: Create database backup
+  - `/api/v1/health`: Health check endpoint
+- Implements proper error handling
+- Includes request validation
+- Logs all requests for debugging
 
-## Support Modules
+## Data Flow
+1. Frontend requests data from API
+2. API layer validates request
+3. Data fetcher retrieves data from local database
+4. During scheduled updates:
+   - Check FRED API for new data
+   - If new data exists, fetch and store in database
+   - Update metadata and timestamps
+5. Get AI analysis (cached if available)
+6. Return combined data to frontend
 
-### exceptions.py
-Custom exception definitions for better error handling:
-- TrackerError (base exception)
-- ServiceInitializationError
-- DataProcessingError
-- BackupError
-- ValidationError
-- PromptError
-- APIError
+## Update Schedule
+- Gas Prices:
+  - Update frequency: Weekly
+  - Source: FRED GASREGW series
+  - Update day: Monday
+- CPI Metrics:
+  - Update frequency: Monthly
+  - Source: FRED CPIAUCSL, CPILFESL, CPIUFDSL series
+  - Update day: 15th of each month
+- Housing Index:
+  - Update frequency: Monthly
+  - Source: FRED CSUSHPISA series
+  - Update day: Last day of month
 
-### decorators.py (81.82% test coverage)
-Utility decorators for enhanced functionality:
-- retry_on_failure (exponential backoff)
-- Error logging and handling
-- Function wrapping utilities
-- Retry mechanism configuration
+## Error Handling
+- Custom exception classes for different error types
+- Proper error logging
+- Graceful degradation
+- User-friendly error messages
+- Retry mechanisms for transient failures
 
-### validators.py (86.84% test coverage)
-Data validation functions for data integrity:
-- Service validation
-- Response format validation
-- Type checking and verification
+## Caching Strategy
+- Database as primary data store
+- In-memory caching for AI analysis
+- Cache invalidation based on data freshness
+- Cache bypass for forced updates
+
+## Security
 - Input validation
-- Data structure validation
-
-## Testing Infrastructure
-- Comprehensive test suite using pytest
-- Test coverage reporting and monitoring
-- Mock objects for external services
-- Integration tests for service interactions
-- Current overall coverage: 34.97% (target: 80%)
-- Two modules exceeding coverage target:
-  * decorators.py: 81.82%
-  * validators.py: 86.84%
-- Active work on improving test coverage
-
-## Database Layer
-- SQLite database for data storage
-- SQLAlchemy ORM for database operations
-- Migration support
-- Backup functionality
-- Data integrity checks
-- Connection management
-
-## API Layer
-- Flask-based RESTful API
-- CORS support
-- Error handling middleware
-- Request validation
-- Response formatting
-- Status monitoring
-
-## Benefits
-- Improved maintainability through separation of concerns
-- Easier testing with isolated components
-- Better error handling at service boundaries
-- Simplified future enhancements
-- Comprehensive test coverage tracking
-- Automated test suite for continuous integration
-- Clear separation of validation, error handling, and business logic
-- Enhanced code organization
-- Improved module reusability
-- Better error traceability
-
-## Future Enhancements
-- Improved logging system
-- Performance monitoring
-- Caching layer
 - Rate limiting
-- Authentication/Authorization
-- API documentation
-- Backup system
-- Security enhancements
+- Request logging
+- Error sanitization
+- CORS configuration
+
+## Monitoring
+- Detailed logging throughout the application
+- Performance metrics logging
+- Error tracking
+- API usage monitoring
+- Data freshness monitoring
+
+## To Do
+1. Implement automated update scheduling
+2. Add data freshness monitoring
+3. Implement database backup functionality
+4. Add data versioning
+5. Implement user authentication
+6. Add admin endpoints for data management
+7. Implement automated testing
+8. Add monitoring alerts
+9. Implement rate limiting for public endpoints
+10. Add data export functionality
+11. Implement automated deployments
+12. Add health check monitoring

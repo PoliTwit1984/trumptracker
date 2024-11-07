@@ -1,131 +1,162 @@
 # API Documentation
 
+## Base URL
+`http://localhost:5003/api/v1`
+
 ## Endpoints
 
-### GET /api/promises
-Returns a list of all tracked promises, grouped by category.
-
-#### Response Format
-```json
-{
-  "Inflation": [
-    {
-      "id": 1,
-      "title": "Lower Consumer Prices",
-      "category": "Inflation",
-      "status": "In Progress",
-      "description": "Promise to reduce the Consumer Price Index (CPI)",
-      "metric_type": "cpi",
-      "last_updated": "2024-11-05"
-    }
-  ]
-}
+### Get Inflation Data
+```
+GET /inflation/data
 ```
 
-### GET /api/inflation-data
-Returns current inflation metrics with historical data.
+Returns current inflation metrics and analysis.
 
-#### Response Format
+#### Response
 ```json
 {
   "status": "Success",
-  "last_updated": "2024-11-05",
   "metrics": {
     "cpi": {
-      "current_value": 314.69,
-      "baseline_value": 308.02,
-      "percentage_change": 2.16,
-      "historical_data": [...],
-      "title": "Consumer Price Index",
-      "units": "Index 1982-1984=100"
+      "title": "Consumer Price Index for All Urban Consumers: All Items in U.S. City Average",
+      "current_value": 314.686,
+      "baseline_value": 308.742,
+      "percentage_change": 1.93,
+      "historical_data": [
+        {
+          "date": "2023-11-01",
+          "value": 308.742
+        },
+        // ... more data points
+      ],
+      "units": "Index 1982-1984=100",
+      "last_updated": "2024-11-06"
+    },
+    "core_cpi": {
+      // Similar structure to cpi
+    },
+    "food": {
+      // Similar structure to cpi
+    },
+    "gas": {
+      // Similar structure to cpi
+    },
+    "housing": {
+      // Similar structure to cpi
     }
   },
-  "analysis": "AI-generated analysis of trends"
+  "analysis": "AI-generated analysis of trends",
+  "timestamp": "2024-11-06T20:28:53.782219"
 }
 ```
 
-## Error Handling
+### Initialize Historical Data
+```
+POST /inflation/initialize
+```
 
-All endpoints use standard HTTP status codes and return detailed error messages:
+Fetches and stores historical data for all metrics.
 
-### Error Response Format
+#### Response
 ```json
 {
-  "status": "Error",
-  "error": "Detailed error message",
-  "code": "ERROR_CODE"
+  "status": "Success",
+  "message": "Historical data fetched and stored successfully",
+  "timestamp": "2024-11-06T20:12:48.488283"
 }
 ```
 
-### Common Error Codes
-- `VALIDATION_ERROR`: Invalid input data
-- `SERVICE_ERROR`: Service initialization or processing error
-- `API_ERROR`: External API error (FRED or Claude)
-- `DATA_ERROR`: Data processing or validation error
-- `BACKUP_ERROR`: Database backup error
-
-### HTTP Status Codes
-- 200: Success
-- 400: Bad Request (validation errors)
-- 401: Unauthorized (invalid API key)
-- 404: Not Found
-- 429: Too Many Requests (rate limit)
-- 500: Internal Server Error
-- 503: Service Unavailable
-
-## Data Validation
-
-All endpoints perform strict data validation:
-
-### Input Validation
-- API keys must be valid
-- Date formats must be ISO 8601
-- Numeric values must be valid floats
-- Required fields must be present
-
-### Output Validation
-- Response format is validated
-- Data types are checked
-- Required fields are verified
-- Metrics data is validated
-
-## Service Architecture
-
-The API is built on a modular service architecture:
-
-### Core Services
-- `data_fetcher.py`: FRED data operations
-- `data_analyzer.py`: AI analysis
-- `inflation_tracker.py`: Service coordination
-
-### Support Modules
-- `validators.py`: Data validation
-- `exceptions.py`: Error handling
-- `decorators.py`: Utility functions
-
-## Rate Limiting
-
-To ensure service stability:
-- 100 requests per minute per IP
-- 1000 requests per hour per IP
-- Retry-After header included in 429 responses
-
-## Testing
-
-API endpoints can be tested using:
-```bash
-# Run all API tests
-python -m pytest tests/test_app.py
-
-# Run specific endpoint tests
-python -m pytest tests/test_app.py::test_get_promises
-python -m pytest tests/test_app.py::test_get_inflation_data
+### Update Data
+```
+POST /inflation/update
 ```
 
-## Future Enhancements
-- Authentication
-- Request batching
-- Response compression
-- Caching layer
-- Metrics collection
-- Performance monitoring
+Updates data with latest values from FRED API.
+
+#### Response
+```json
+{
+  "status": "Success",
+  "message": "Data updated successfully",
+  "timestamp": "2024-11-06T20:12:48.488283"
+}
+```
+
+### Backup Database
+```
+POST /inflation/backup
+```
+
+Creates a backup of the current database.
+
+#### Response
+```json
+{
+  "status": "Success",
+  "message": "Database backup created successfully",
+  "timestamp": "2024-11-06T20:12:48.488283"
+}
+```
+
+### Health Check
+```
+GET /health
+```
+
+Returns service health status.
+
+#### Response
+```json
+{
+  "status": "healthy",
+  "timestamp": "2024-11-06T20:12:48.488283",
+  "version": "1.0.0",
+  "services": {
+    "data_fetcher": "healthy",
+    "analyzer": "healthy"
+  }
+}
+```
+
+## Error Responses
+
+All endpoints may return the following error responses:
+
+### Rate Limit Exceeded
+```json
+{
+  "error": "Rate limit exceeded",
+  "status": "error",
+  "timestamp": "2024-11-06T20:12:48.488283"
+}
+```
+
+### Service Error
+```json
+{
+  "error": "Internal server error",
+  "status": "error",
+  "timestamp": "2024-11-06T20:12:48.488283"
+}
+```
+
+### Validation Error
+```json
+{
+  "error": "Invalid request parameters",
+  "status": "error",
+  "timestamp": "2024-11-06T20:12:48.488283"
+}
+```
+
+## To Do
+1. Add authentication endpoints
+2. Add data export endpoints
+3. Add admin endpoints
+4. Add metric configuration endpoints
+5. Add data comparison endpoints
+6. Add data versioning endpoints
+7. Add monitoring endpoints
+8. Add rate limit configuration endpoints
+9. Add webhook configuration endpoints
+10. Add data validation endpoints

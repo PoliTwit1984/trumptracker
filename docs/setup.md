@@ -1,117 +1,145 @@
-# Setup Instructions
+# Setup Guide
 
 ## Prerequisites
-- Python 3.12+
-- Node.js 18+
-- FRED API key
-- Anthropic API key
 
-## Backend Setup
+### Required Software
+- Python 3.8 or higher
+- Node.js 16 or higher
+- npm 8 or higher
+- Git
+- VSCode (recommended)
+
+### API Keys
+- FRED API key from [Federal Reserve Economic Data](https://fred.stlouisfed.org/docs/api/api_key.html)
+- Claude API key from [Anthropic](https://anthropic.com/)
+
+## Environment Setup
+
+### 1. Clone Repository
 ```bash
-# Create and activate virtual environment
-python3 -m venv venv
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Set environment variables
-export FRED_API_KEY=your_fred_api_key
-export ANTHROPIC_API_KEY=your_claude_api_key
-
-# Start the server
-cd backend
-python app.py
+git clone https://github.com/yourusername/trumptracker.git
+cd trumptracker
 ```
 
-## Frontend Setup
+### 2. Backend Setup
+
+#### Create Virtual Environment
 ```bash
-# Install dependencies
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+#### Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+#### Environment Variables
+Create a `.env` file in the root directory:
+```env
+FRED_API_KEY=your_fred_api_key
+ANTHROPIC_API_KEY=your_claude_api_key
+CLAUDE_MODEL=claude-3-5-sonnet-20241022
+```
+
+#### Initialize Database
+```bash
+# Start the Flask server
+python -m backend.app
+
+# In another terminal, initialize the database
+curl -X POST http://localhost:5003/api/v1/inflation/initialize
+```
+
+### 3. Frontend Setup
+
+#### Install Dependencies
+```bash
 cd frontend
 npm install
-
-# Start development server
-npm run dev
 ```
 
-## Development Notes
+## Running the Application
 
-### Environment Variables
-- FRED_API_KEY: Required for accessing Federal Reserve Economic Data
-- ANTHROPIC_API_KEY: Required for AI analysis features
-
-### Development Server
-- Backend runs on http://localhost:5000
-- Frontend runs on http://localhost:3000
-- API endpoints are CORS-enabled for development
-
-### Running Tests
+### Start Backend Server
 ```bash
-# Run all backend tests with coverage
-cd backend
-python -m pytest --cov=services tests/
+# From project root
+python -m backend.app
+```
+Backend will be available at `http://localhost:5003`
 
-# Run specific test modules
-python -m pytest tests/test_inflation_tracker.py -v
-python -m pytest tests/test_data_analyzer.py -v
-python -m pytest tests/test_data_fetcher.py -v
+### Start Frontend Development Server
+```bash
+# From frontend directory
+npm run dev
+```
+Frontend will be available at `http://localhost:5173`
 
-# Run frontend tests
-cd frontend
+## Development
+
+### Backend Development
+- API endpoints are in `backend/api/routes.py`
+- Database models are in `backend/database.py`
+- Services are in `backend/services/`
+- Tests are in `backend/tests/`
+
+### Frontend Development
+- Components are in `frontend/src/components/`
+- Styles are in `frontend/src/`
+- Assets are in `frontend/src/assets/`
+
+## Testing
+
+### Backend Tests
+```bash
+# From project root
+pytest backend/tests/
+```
+
+### Frontend Tests (Planned)
+```bash
+# From frontend directory
 npm test
 ```
 
-### Test Coverage
-Current coverage by module:
-- decorators.py: 81.82%
-- validators.py: 86.84%
-- data_analyzer.py: 15.18%
-- data_fetcher.py: 13.22%
-- Overall: 34.97%
+## Common Issues
 
-Target coverage: 80%
+### Database Issues
+If you encounter database issues:
+1. Delete the `fred_data.db` file
+2. Restart the backend server
+3. Re-initialize the database
 
-### Code Organization
-```
-backend/
-├── services/           # Core service modules
-│   ├── config.py      # Configuration
-│   ├── data_fetcher.py # FRED integration
-│   ├── data_analyzer.py # AI analysis
-│   ├── inflation_tracker.py # Service coordinator
-│   ├── exceptions.py  # Custom exceptions
-│   ├── decorators.py  # Utility decorators
-│   └── validators.py  # Data validation
-└── tests/            # Test suite
-```
+### Rate Limiting
+- FRED API has a rate limit of 120 requests per minute
+- Claude API has rate limiting based on your plan
+- Backend implements rate limiting of 5 requests per second
 
-### Development Workflow
-1. Activate virtual environment
-2. Run tests before making changes
-3. Make code changes
-4. Run tests again to verify
-5. Check test coverage
-6. Update documentation if needed
+### Cache Issues
+If you encounter stale data:
+1. Clear the browser cache
+2. Restart the backend server
+3. Re-initialize the database
 
-### Common Issues
-- Import errors in tests: Make sure you're running from the correct directory
-- Missing API keys: Check environment variables
-- Test failures: Check mock configurations
-- Coverage below target: Add missing test cases
+## To Do
 
-### Best Practices
-- Run tests frequently during development
-- Keep test coverage high
-- Update documentation with changes
-- Follow modular service architecture
-- Use proper error handling
-- Validate all inputs
-- Write comprehensive tests
+### Backend Setup
+1. Add database migration commands
+2. Add automated database backup
+3. Add development/production configs
+4. Add logging configuration
+5. Add monitoring setup
 
-### Troubleshooting
-- Check environment variables are set
-- Verify virtual environment is active
-- Ensure all dependencies are installed
-- Check test fixtures are properly configured
-- Verify mock objects are set up correctly
-- Review error messages carefully
+### Frontend Setup
+1. Add TypeScript configuration
+2. Add testing setup
+3. Add storybook setup
+4. Add PWA configuration
+5. Add production build setup
+
+### Development Tools
+1. Add pre-commit hooks
+2. Add code formatting tools
+3. Add automated testing
+4. Add CI/CD pipeline
+5. Add deployment scripts
