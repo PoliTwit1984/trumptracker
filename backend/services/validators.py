@@ -5,7 +5,7 @@ from .exceptions import ServiceInitializationError, DataProcessingError
 from .data_fetcher import FREDDataFetcher
 from .data_analyzer import InflationAnalyzer
 
-def validate_services(data_fetcher: FREDDataFetcher, analyzer: InflationAnalyzer) -> None:
+def validate_services(data_fetcher, analyzer) -> None:
     """Validate that required services are properly initialized."""
     if not isinstance(data_fetcher, FREDDataFetcher):
         raise ServiceInitializationError("Invalid data fetcher service")

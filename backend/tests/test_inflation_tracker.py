@@ -7,16 +7,22 @@ from datetime import datetime
 from backend.services.inflation_tracker import InflationTracker
 from backend.services.exceptions import ServiceInitializationError, DataProcessingError, BackupError
 from backend.services.validators import validate_services, validate_response_format
+from backend.services.data_fetcher import FREDDataFetcher
+from backend.services.data_analyzer import InflationAnalyzer
 
 @pytest.fixture
 def mock_data_fetcher():
     """Create a mock data fetcher."""
-    return MagicMock()
+    mock = MagicMock(spec=FREDDataFetcher)
+    mock.__class__ = FREDDataFetcher
+    return mock
 
 @pytest.fixture
 def mock_analyzer():
     """Create a mock analyzer."""
-    return MagicMock()
+    mock = MagicMock(spec=InflationAnalyzer)
+    mock.__class__ = InflationAnalyzer
+    return mock
 
 @pytest.fixture
 def tracker(mock_data_fetcher, mock_analyzer):
@@ -152,10 +158,11 @@ def test_get_status(tracker):
 def test_retry_mechanism(tracker):
     """Test retry mechanism for operations."""
     # Set up mock to fail twice then succeed
-    mock_operation = MagicMock()
-    mock_operation.side_effect = [Exception("First failure"), 
-                                 Exception("Second failure"), 
-                                 {'status': 'Success'}]
+    mock_operation = MagicMock(side_effect=[
+        Exception("First failure"),
+        Exception("Second failure"),
+        {'status': 'Success'}
+    ])
     
     tracker.data_fetcher.fetch_and_store_historical_data = mock_operation
     result = tracker.fetch_and_store_historical_data()
